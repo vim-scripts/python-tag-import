@@ -1,0 +1,78 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=2780
+
+repo: http://github.com/mjbrownie/Python-Tag-Import/tree/master. bugs/suggestions welcome
+
+visual example here http://ttyshare.com/rec/michael/77604285/
+
+This is for when you remember the name of a library function/class but not the module.path it is under
+
+Eg. on a new line type. (control-b in insert mode is the default key but can be changed. see below)
+
+funcname<c-b>
+to get complete import  options eg 
+
+from foo.bar.module import funcname
+import foo.bar.module as module
+
+etc.
+
+In normal mode <leader>i will create an import for the current word
+
+You can customise the import statements to your style preferences in your .vimrc eg
+
+let g:pythontagimport_from = 0
+turns off 
+from  foo.bar.module import funcname
+
+let g:pythontagimport_from_mod = 0
+turns off 
+from foo.bar import module #module.funcname
+
+let g:pythontagimport_as = 0
+turns off 
+import foo.bar.module as module #module.funcname
+
+let g:pythontagimport_full  = 0
+turns off
+import foo.bar.module #foo.bar.module.funcname
+
+
+" Usage:
+"
+"           You need a ctags file with the --fields=+i
+"           option set
+"
+"           on a new line type the function you want to import
+"           then hit the complete key
+"           
+"           eg. type on a line
+"           
+"           some_func
+"           hit <c-b>in insert mode and get
+"           from some.app.module.path import some_func
+"
+"           hotkey:
+"               insert mode map.
+"               <c-b> is the current default.
+"
+"           variables:
+"
+"               g:pythontagimportkey
+"                   the key used to complete function
+"                   parameters and key words.
+"
+"Limitations:
+"
+"           This plugin is only as smart as your tags file.
+"           Completion is created through inspecting the filename
+"           in the tags file so functions that are rereferenced will not be
+"           picked up. I put this out there in the hope someone can do 
+"           some fancy introspective alternative.
+"
+"Options:
+"           Setting the path can keep options relevant. At tht moment
+"           it defaults to sys.path. It can come up with some bad guesses
+"           Eg.
+"           let g:python_path = ['/usr/lib/python2.4/site-packages/']
+
+
