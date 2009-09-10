@@ -72,6 +72,8 @@ endfunction
 
 if !exists('g:python_path')
     python import sys;import vim;vim.command("let g:python_path = %s" % str(sys.path))
+else
+    let g:python_path = g:python_path + [getcwd()]
 endif
 
 function!PythonTagImportComplete()
@@ -80,11 +82,12 @@ function!PythonTagImportComplete()
     let s:pythontagcomplete_selected = ''
 
     let s:pythontagcomplete_list = []
+
     for tag in s:taglist
         if tag['kind'] != 'm'
             for path in g:python_path
                 let filename = tag['filename']
-                if match(filename, path) != -1
+                if match(filename, path) != -1 || match(filename,'^\w') != -1
                     let filename = substitute(filename, path, '','')
                     let filename=substitute(filename, "/", '.', 'g')
                     let filename=substitute(filename, ".__init__.py", "", "")
