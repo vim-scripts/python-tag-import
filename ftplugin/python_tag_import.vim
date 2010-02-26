@@ -2,8 +2,8 @@
 " File:         python_tag_import.vim
 " Brief:        python_tag_import import shortcut based on tags file
 " Author:       Michael Brown <michael@ascetinteractive.com>
-" Last Change:  2009-7-9
-" Version:      0.3
+" Last Change:  2010-2-26
+" Version:      0.3.1
 "
 " Install:      1. Put python_tag_import.vim to plugin
 "                  directory.
@@ -22,9 +22,37 @@
 "
 "           variables:
 "
-"               g:pythontagimportkey
-"                   the key used to complete function
-"                   parameters and key words.
+"               let g:pythontagimportkey = "<c-x><c-i>"
+"
+"               the key used to complete function
+"               parameters and key words.
+"
+"
+"               let g:pythontagimportcurrentword = "<leader>i"
+"
+"               This key map creates an import statement for the <cword>
+"               in normal mode
+"
+"               let g:pythontagimport_from = 0
+"
+"               turns off
+"               from  foo.bar.module import funcname
+
+"               let g:pythontagimport_from_mod = 0
+"
+"               turns off
+"               from foo.bar import module #module.funcname
+
+"               let g:pythontagimport_as = 0
+"
+"               turns off
+"               import foo.bar.module as module #module.funcname
+
+"               let g:pythontagimport_full  = 0
+"
+"               turns off
+"               import foo.bar.module #foo.bar.module.funcname
+"
 "
 "Limitations:
 "
@@ -43,10 +71,14 @@ if v:version < 700
     finish
 endif
 
-" Variable Definations: {{{1
+" Variable Definitions: {{{1
 " options, define them as you like in vimrc:
 if !exists("g:pythontagimportkey")
     let g:pythontagimportkey = "<c-b>"   "hotkey
+endif
+
+if !exists("g:pythontagimportcurrentword")
+    let g:pythontagimportcurrentword = "<leader>i"   "hotkey
 endif
 
 "This  gives the option to turn off methods you dont like
@@ -68,7 +100,7 @@ endif
 " ----------------------------
 
 " Autocommands:
-autocmd BufReadPost,BufNewFile * call PythonTagImportStart()
+autocmd BufReadPost,BufNewFile *.py call PythonTagImportStart()
 
 " Menus:
 menu <silent>       &Tools.Python\ Tag\ Complete\ Start          :call PythonTagImportStart()<CR>
@@ -79,6 +111,7 @@ menu <silent>       &Tools.Python\ Tag\ Complete\ Stop           :call PythonTag
 function! PythonTagImportStart()
     exec "silent! iunmap  <buffer> ".g:pythontagimportkey
     exec "inoremap <buffer> ".g:pythontagimportkey."  <c-r>=PythonTagImportComplete()<cr>"
+    exec "nnoremap <buffer> ".g:pythontagimportcurrentword."  yiwO<esc>pA<C-R>=PythonTagImportComplete()<CR>"
 endfunction
 
 function! PythonTagImportStop()
@@ -97,13 +130,14 @@ function!PythonTagImportComplete()
         return ''
     endif
 
-    let s:taglist =taglist(expand('<cword>'))
-    let curtag = expand('<cword>')
+    let curtag = getline('.')
+    let tag_list = []
+    let tag_list = taglist(curtag)
     let s:pythontagcomplete_selected = ''
 
     let s:pythontagcomplete_list = []
 
-    for tag in s:taglist
+    for tag in tag_list
         if tag['kind'] != 'm'
             for path in g:python_path
                 let filename = tag['filename']
